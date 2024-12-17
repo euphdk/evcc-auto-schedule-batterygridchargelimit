@@ -14,7 +14,15 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type EvccAPIRate struct {
+type RatesResponse struct {
+	Result Result `json:"result"`
+}
+
+type Result struct {
+	Rates []Rates `json:"rates"`
+}
+
+type Rates struct {
 	Start time.Time `json:"start"`
 	End   time.Time `json:"end"`
 	Price float64   `json:"price"`
@@ -30,11 +38,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	apiRatesURL := os.Getenv("APIRATESURL")
-	evccURL := os.Getenv("EVCCURL")
-	now := time.Now()
+	evcc := os.Getenv("EVCC")
 
-	resp, err := httpClient.Get(apiRatesURL)
+	ratesURL := fmt.Sprintf("%s/api/tariff/grid", evcc)
+	chargelimitURL := fmt.Sprintf("%s/api/batterygridchargelimit", evcc)
+
+	resp, err := httpClient.Get(ratesURL)
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)
@@ -47,20 +56,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	var rates []EvccAPIRate
-	err = json.Unmarshal(body, &rates)
+	var ratesResponse RatesResponse
+
+	err = json.Unmarshal(body, &ratesResponse)
 	if err != nil {
 		slog.Error(err.Error())
 		os.Exit(1)
 	}
 
-	upcomingRates := make([]EvccAPIRate, 0)
-
-	for _, r := range rates {
-		if r.Start.After(now) {
-			upcomingRates = append(upcomingRates, r)
-		}
-	}
+	upcomingRates := ratesResponse.Result.Rates
 
 	sort.Slice(upcomingRates, func(i, j int) bool {
 		return upcomingRates[i].Price < upcomingRates[j].Price
@@ -70,7 +74,7 @@ func main() {
 	lowPrice := upcomingRates[4]
 
 	// find the highest price _after_ lowPrice
-	var highPrice EvccAPIRate
+	var highPrice Rates
 	for _, h := range upcomingRates {
 		if h.Start.After(lowPrice.Start) && h.Price > highPrice.Price {
 			highPrice = h
@@ -88,7 +92,7 @@ func main() {
 
 	fmt.Println("Chargelimit:", chargelimit)
 
-	url := fmt.Sprintf("%s%g", evccURL, chargelimit)
+	url := fmt.Sprintf("%s/%g", chargelimitURL, chargelimit)
 
 	postResp, err := httpClient.Post(url, "application/json", nil)
 	if err != nil {
