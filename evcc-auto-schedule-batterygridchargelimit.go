@@ -54,11 +54,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	sort.Slice(rates, func(i, j int) bool {
-		return rates[i].Price < rates[j].Price
-	})
-	// litter.Dump(rates)
-
 	upcomingRates := make([]EvccAPIRate, 0)
 
 	for _, r := range rates {
@@ -68,7 +63,9 @@ func main() {
 		}
 	}
 
-	// litter.Dump(upcomingRates)
+	sort.Slice(upcomingRates, func(i, j int) bool {
+		return upcomingRates[i].Price < upcomingRates[j].Price
+	})
 
 	// It takes approx ~4 hours to charge the battery, so find the 5th lowest price
 	lowPrice := upcomingRates[4]
@@ -83,13 +80,11 @@ func main() {
 		}
 	}
 
-	// highPrice := upcomingRates[len(upcomingRates)-1]
-
 	fmt.Println("Low:", lowPrice.Price, "Start:", lowPrice.Start)
 	fmt.Println("High:", highPrice.Price, "Start:", highPrice.Start)
 
+	// Only schedule charge if highPrice is at least twice the lowprice
 	var chargelimit float64 = 0
-
 	if highPrice.Price > 2*lowPrice.Price {
 		chargelimit = math.Ceil(lowPrice.Price*20) / 20
 	}
