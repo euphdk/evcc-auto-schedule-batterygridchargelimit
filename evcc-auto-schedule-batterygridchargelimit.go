@@ -64,18 +64,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	upcomingRates := ratesResponse.Result.Rates
+	rates := ratesResponse.Result.Rates
 
-	sort.Slice(upcomingRates, func(i, j int) bool {
-		return upcomingRates[i].Price < upcomingRates[j].Price
+	sort.Slice(rates, func(i, j int) bool {
+		return rates[i].Price < rates[j].Price
 	})
 
 	// It takes approx ~4 hours to charge the battery, so find the 5th lowest price
-	lowPrice := upcomingRates[4]
+	lowPrice := rates[4]
 
 	// find the highest price _after_ lowPrice
 	var highPrice Rates
-	for _, h := range upcomingRates {
+	for _, h := range rates {
 		if h.Start.After(lowPrice.Start) && h.Price > highPrice.Price {
 			highPrice = h
 		}
