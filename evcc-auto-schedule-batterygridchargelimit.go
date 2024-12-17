@@ -58,7 +58,6 @@ func main() {
 
 	for _, r := range rates {
 		if r.Start.After(now) {
-			// fmt.Println(r.Start, r.Price)
 			upcomingRates = append(upcomingRates, r)
 		}
 	}
@@ -71,9 +70,7 @@ func main() {
 	lowPrice := upcomingRates[4]
 
 	// find the highest price _after_ lowPrice
-
 	var highPrice EvccAPIRate
-
 	for _, h := range upcomingRates {
 		if h.Start.After(lowPrice.Start) && h.Price > highPrice.Price {
 			highPrice = h
