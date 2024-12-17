@@ -66,6 +66,11 @@ func main() {
 
 	rates := ratesResponse.Result.Rates
 
+	if len(rates) < 4 {
+		slog.Error("not enough rates to do anything meaningful")
+		os.Exit(1)
+	}
+
 	sort.Slice(rates, func(i, j int) bool {
 		return rates[i].Price < rates[j].Price
 	})
