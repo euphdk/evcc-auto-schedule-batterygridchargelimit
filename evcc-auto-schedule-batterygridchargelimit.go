@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-	"github.com/sanity-io/litter"
 )
 
 type EvccAPIRate struct {
@@ -58,23 +57,33 @@ func main() {
 	sort.Slice(rates, func(i, j int) bool {
 		return rates[i].Price < rates[j].Price
 	})
-	litter.Dump(rates)
+	// litter.Dump(rates)
 
 	upcomingRates := make([]EvccAPIRate, 0)
 
 	for _, r := range rates {
 		if r.Start.After(now) {
-			fmt.Println(r.Start, r.Price)
+			// fmt.Println(r.Start, r.Price)
 			upcomingRates = append(upcomingRates, r)
 		}
 	}
 
-	litter.Dump(upcomingRates)
+	// litter.Dump(upcomingRates)
 
 	// It takes approx ~4 hours to charge the battery, so find the 5th lowest price
 	lowPrice := upcomingRates[4]
 
-	highPrice := upcomingRates[len(upcomingRates)-1]
+	// find the highest price _after_ lowPrice
+
+	var highPrice EvccAPIRate
+
+	for _, h := range upcomingRates {
+		if h.Start.After(lowPrice.Start) && h.Price > highPrice.Price {
+			highPrice = h
+		}
+	}
+
+	// highPrice := upcomingRates[len(upcomingRates)-1]
 
 	fmt.Println("Low:", lowPrice.Price, "Start:", lowPrice.Start)
 	fmt.Println("High:", highPrice.Price, "Start:", highPrice.Start)
