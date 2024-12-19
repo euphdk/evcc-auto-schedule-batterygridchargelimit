@@ -34,11 +34,15 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		slog.Error("Error loading .env file")
-		os.Exit(1)
+		slog.Warn("Error loading .env file")
 	}
 
 	evcc := os.Getenv("EVCC")
+
+	if evcc == "" {
+		slog.Error("missing EVCC env")
+		os.Exit(1)
+	}
 
 	ratesURL := fmt.Sprintf("%s/api/tariff/grid", evcc)
 	chargelimitURL := fmt.Sprintf("%s/api/batterygridchargelimit", evcc)
