@@ -89,9 +89,9 @@ func main() {
 	fmt.Println("Low:", lowPrice.Price, "Start:", lowPrice.Start)
 	fmt.Println("High:", highPrice.Price, "Start:", highPrice.Start)
 
-	// Only schedule charge if highPrice is at least twice the lowprice OR the price is totally negative (as if it would ever happen...)
+	// Only set chargelimit if highPrice is at least 2DKK higher than lowPrice. otherwise use charge if the price is totally negative (as if it would ever happen...)
 	var chargelimit float64 = 0
-	if highPrice.Price > 2*lowPrice.Price {
+	if highPrice.Price-lowPrice.Price > 2 {
 		chargelimit = math.Ceil(lowPrice.Price*20) / 20
 	}
 
