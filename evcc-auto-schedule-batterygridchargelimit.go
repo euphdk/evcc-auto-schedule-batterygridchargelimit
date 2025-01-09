@@ -79,8 +79,8 @@ func main() {
 		return rates[i].Price < rates[j].Price
 	})
 
-	// It takes approx ~4 hours to charge the battery, so find the 5th lowest price
-	lowPrice := rates[4]
+	// It takes approx ~4 hours to charge the battery, so find the 4th lowest price
+	lowPrice := rates[3]
 
 	// find the highest price _after_ lowPrice
 	var highPrice Rates
