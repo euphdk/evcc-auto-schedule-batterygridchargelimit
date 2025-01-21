@@ -98,7 +98,7 @@ func main() {
 
 	// Only set chargelimit if highPrice is at least 2DKK higher than lowPrice. otherwise use charge if the price is totally negative (as if it would ever happen...)
 	var chargelimit float64 = 0
-	if diff > 2 {
+	if diff > 1.75 {
 		chargelimit = math.Ceil(lowPrice.Price*20) / 20
 	}
 
